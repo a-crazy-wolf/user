@@ -1,12 +1,17 @@
 package com.learning.user.controller;
 
+import com.learning.user.dto.BaseResponseDTO;
 import com.learning.user.dto.UserDto;
+import com.learning.user.dto.search.SearchQueryRequest;
+import com.learning.user.dto.search.UserListDto;
 import com.learning.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Locale;
 
 @RestController
 public class UserController {
@@ -44,6 +49,20 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.OK).body("Reset password successfully!");
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/search")
+    @PreAuthorize("hasAuthority('view')")
+    public ResponseEntity<?> getUserList(@RequestBody SearchQueryRequest searchQueryRequest, Locale locale) {
+        BaseResponseDTO baseResponseDTO = new BaseResponseDTO();
+        try {
+            UserListDto userListDto = userService.getUserList(searchQueryRequest);
+            baseResponseDTO.setData(userListDto);
+            baseResponseDTO.setMessage(HttpStatus.OK.getReasonPhrase());
+            return ResponseEntity.status(HttpStatus.OK).body(baseResponseDTO);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(baseResponseDTO);
         }
     }
 

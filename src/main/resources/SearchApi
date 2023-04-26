@@ -1,0 +1,32 @@
+curl --location --request POST 'http://localhost:8081/user/search' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "offset": 0,
+    "size": 10,
+    "searchQueries": [
+        {
+            "parentOperator": "",
+            "searchFilter": [
+                {
+                    "operator": "LIKE",
+                    "property": "emailId",
+                    "value": "admin"
+                }
+            ]
+        },
+        {
+            "parentOperator": "OR",
+            "searchFilter": [
+                {
+                    "operator": "EQUALS",
+                    "property": "firstName",
+                    "value": "admin"
+                }
+            ]
+        }
+    ],
+    "sortOrder": {
+        "ascendingOrder": ["firstName"],
+        "descendingOrder": []
+    }
+}'

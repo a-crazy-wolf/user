@@ -4,6 +4,8 @@ import com.learning.user.dto.UserDto;
 import com.learning.user.model.User;
 import org.mapstruct.*;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface MapperUtil {
 
@@ -14,4 +16,6 @@ public interface MapperUtil {
     User userDtoToUserEntity(UserDto dto);
 
     UserDto userEntityToUserDto(User entity);
+
+    List<UserDto> getUserDTOList(List<User> userList);
 }

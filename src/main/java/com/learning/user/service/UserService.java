@@ -1,15 +1,22 @@
 package com.learning.user.service;
 
 import com.learning.user.dto.UserDto;
+import com.learning.user.dto.search.SearchQueryRequest;
+import com.learning.user.dto.search.UserListDto;
 import com.learning.user.model.Role;
 import com.learning.user.model.User;
 import com.learning.user.repository.RoleRepository;
 import com.learning.user.repository.UserRepository;
 import com.learning.user.util.MapperUtil;
+import com.learning.user.util.SpecificationUtil;
 import org.apache.commons.codec.binary.Base32;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -81,5 +88,24 @@ public class UserService {
         random.nextBytes(bytes);
         Base32 base32 = new Base32();
         return base32.encodeToString(bytes);
+    }
+
+    public UserListDto getUserList(SearchQueryRequest searchQueryRequest) {
+        UserListDto responseDTO = new UserListDto();
+        List<UserDto> userDTOs = new ArrayList<>();
+
+        PageRequest pageRequest = SpecificationUtil.getPageRequest(searchQueryRequest);
+        Specification<User> userDetailsSpecification = SpecificationUtil.prepareSearchQuery(searchQueryRequest, User.class);
+        Page<User> page = userRepository.findAll(userDetailsSpecification, pageRequest);
+        List<User> userDetailsList = page.getContent();
+
+        if(!CollectionUtils.isEmpty(userDetailsList)) {
+            userDTOs = mapperUtil.getUserDTOList(userDetailsList);
+        }
+        responseDTO.setUserList(userDTOs);
+        responseDTO.setBatchOffset(page.getNumber());
+        responseDTO.setBatchSize(page.getSize());
+        responseDTO.setTotalSize(page.getTotalElements());
+        return responseDTO;
     }
 }
