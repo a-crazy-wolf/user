@@ -2,6 +2,9 @@ package com.learning.user.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
+import org.hibernate.envers.AuditOverride;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -11,7 +14,9 @@ import java.util.List;
 @Table(name = "users")
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class User implements Serializable {
+@Audited(withModifiedFlag = true)
+@AuditOverride(forClass = AuditableEntity.class, isAudited = true)
+public class User extends AuditableEntity implements Serializable {
 
     private static final long serialVersionUID = -1;
 
@@ -43,6 +48,7 @@ public class User implements Serializable {
 
     private int failedAttempt;
 
+    @NotAudited
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name="role_user" ,
             joinColumns = {@JoinColumn(name = "user_id" ,referencedColumnName = "id")},
