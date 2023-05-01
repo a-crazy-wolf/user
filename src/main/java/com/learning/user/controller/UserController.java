@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Locale;
 
 @RestController
@@ -66,4 +67,14 @@ public class UserController {
         }
     }
 
+    @GetMapping("/revision")
+    @PreAuthorize("hasAuthority('view')")
+    public ResponseEntity<?> getUser(@RequestParam Long userId){
+        try {
+            List<UserDto> userDtos = userService.getUserPasswordRevisions(userId);
+            return ResponseEntity.status(HttpStatus.OK).body(userDtos);
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(e.getMessage());
+        }
+    }
 }

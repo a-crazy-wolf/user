@@ -7,6 +7,7 @@ import com.learning.user.model.Role;
 import com.learning.user.model.User;
 import com.learning.user.repository.RoleRepository;
 import com.learning.user.repository.UserRepository;
+import com.learning.user.service.audit.UserRevisionService;
 import com.learning.user.util.MapperUtil;
 import com.learning.user.util.SpecificationUtil;
 import org.apache.commons.codec.binary.Base32;
@@ -37,6 +38,9 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserRevisionService userRevisionService;
 
     public void saveUser(UserDto userDto) throws Exception{
         Optional<User> optionalUser = userRepository.findByEmailId(userDto.getEmailId());
@@ -107,5 +111,14 @@ public class UserService {
         responseDTO.setBatchSize(page.getSize());
         responseDTO.setTotalSize(page.getTotalElements());
         return responseDTO;
+    }
+
+    public List<UserDto> getUserPasswordRevisions(Long userId) {
+        List<User> userList = userRevisionService.getUserPasswordRevisions(userId);
+        if(userList.isEmpty()){
+            return new ArrayList<>();
+        }else{
+            return mapperUtil.getUserDTOList(userList);
+        }
     }
 }
